@@ -1,21 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
-import { BarChart } from 'lucide-react';
-import { useGoogleSheets } from '../hooks/useGoogleSheets';
+import { BarChart, AlertCircle } from 'lucide-react';
+import type { CredentialResponse } from '@react-oauth/google';
 
-export const LoginPage: React.FC = () => {
+interface LoginError {
+  message: string;
+  visible: boolean;
+}
+
+export const LoginPage = () => {
   const { handleLogin } = useAuth();
-  const { data, loading, error } = useGoogleSheets('Sheet1!A1:Z1000'); // Adjust range as needed
+  const [error, setError] = useState<LoginError>({ message: '', visible: false });
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (data) {
-      console.log('Spreadsheet data:', data);
+  const handleLoginSuccess = async (response: CredentialResponse) => {
+    try {
+      setIsLoading(true);
+      setError({ message: '', visible: false });
+      await handleLogin(response);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : 'Login failed. Please try again.',
+        visible: true
+      });
+    } finally {
+      setIsLoading(false);
     }
-    if (error) {
-      console.error('Error loading spreadsheet:', error);
-    }
-  }, [data, error]);
+  };
+
+  const handleLoginError = () => {
+    setError({
+      message: 'Google login failed. Please try again later.',
+      visible: true
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -33,15 +52,23 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="bg-gray-800 rounded-xl shadow-xl p-8 border border-gray-700">
+          {error.visible && (
+            <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg flex items-center gap-2 text-red-200">
+              <AlertCircle className="w-5 h-5" />
+              <span>{error.message}</span>
+            </div>
+          )}
+          
           <div className="flex justify-center">
             <GoogleLogin
-              onSuccess={handleLogin}
-              onError={() => console.log('Login Failed')}
+              onSuccess={handleLoginSuccess}
+              onError={handleLoginError}
               useOneTap
               theme="filled_black"
               size="large"
               text="continue_with"
               shape="circle"
+              disabled={isLoading}
               scope="https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly"
             />
           </div>
