@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getGoogleSheetsData, listSpreadsheets } from '../utils/googleSheetsService';
+import { getGoogleSheetsData, listAllSpreadsheets } from '../utils/googleSheetsService';
 import { useAuth } from './useAuth';
 
 export function useGoogleSheets() {
@@ -17,11 +17,15 @@ export function useGoogleSheets() {
       }
 
       try {
-        const sheets = await listSpreadsheets(accessToken);
+        console.log('Fetching spreadsheets with access token:', !!accessToken);
+        const sheets = await listAllSpreadsheets(accessToken);
+        console.log('Received spreadsheets:', sheets);
         setSpreadsheets(sheets || []);
-        setLoading(false);
+        setError(null);
       } catch (err) {
+        console.error('Error fetching spreadsheets:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch spreadsheets'));
+      } finally {
         setLoading(false);
       }
     };
