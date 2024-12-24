@@ -29,7 +29,7 @@ export function useGoogleSheets() {
     fetchSpreadsheets();
   }, [accessToken]);
 
-  const getSheetData = async (spreadsheetId: string, range: string) => {
+  const getSheetData = async (_spreadsheetId: string, range: string) => {
     if (!accessToken) {
       throw new Error('Not authenticated');
     }
