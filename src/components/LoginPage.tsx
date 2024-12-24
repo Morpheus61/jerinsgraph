@@ -69,14 +69,3 @@ export const LoginPage = () => {
               text="continue_with"
               shape="circle"
               disabled={isLoading}
-              scope="https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly"
-            />
-          </div>
-          <p className="text-gray-400 text-sm text-center mt-6">
-            Your Google account will be used to access your spreadsheets automatically
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
