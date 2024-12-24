@@ -1,5 +1,5 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm run build"
+  command = "npm install --force && npm run build"
   publish = "dist"
   site_id = "d948ea23-b9c9-4f19-b06c-8e490dd53c91"
 
@@ -8,7 +8,7 @@
   CI = "false"
   NETLIFY_SITE_NAME = "resilient-frangipane-0c6441"
   VITE_DEV = "false"
-  NPM_FLAGS = "--legacy-peer-deps"
+  NPM_FLAGS = "--force"
 
 [[redirects]]
   from = "/*"
