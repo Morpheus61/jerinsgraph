@@ -1,26 +1,41 @@
 import { useState, useEffect } from 'react';
-import { getGoogleSheetsData, initGoogleSheetsAuth } from '../utils/googleSheetsService';
+import { getGoogleSheetsData, listSpreadsheets } from '../utils/googleSheetsService';
+import { useAuth } from './useAuth';
 
-export function useGoogleSheets(range: string) {
-  const [data, setData] = useState<any[][]>([]);
+export function useGoogleSheets() {
+  const [spreadsheets, setSpreadsheets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { accessToken } = useAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSpreadsheets = async () => {
+      if (!accessToken) {
+        setError(new Error('Not authenticated'));
+        setLoading(false);
+        return;
+      }
+
       try {
-        await initGoogleSheetsAuth();
-        const result = await getGoogleSheetsData(range);
-        setData(result || []);
+        const sheets = await listSpreadsheets(accessToken);
+        setSpreadsheets(sheets || []);
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch data'));
+        setError(err instanceof Error ? err : new Error('Failed to fetch spreadsheets'));
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [range]);
+    fetchSpreadsheets();
+  }, [accessToken]);
 
-  return { data, loading, error };
+  const getSheetData = async (spreadsheetId: string, range: string) => {
+    if (!accessToken) {
+      throw new Error('Not authenticated');
+    }
+
+    return await getGoogleSheetsData(accessToken, range);
+  };
+
+  return { spreadsheets, loading, error, getSheetData };
 }

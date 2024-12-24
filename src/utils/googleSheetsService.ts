@@ -1,7 +1,9 @@
 import { google } from 'googleapis';
 
-const SPREADSHEET_ID = '1YOzEDIfoec-nbJ9d7dLoO87-8SjWPEfY4MaO1dH499E';
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
+const SCOPES = [
+  'https://www.googleapis.com/auth/spreadsheets.readonly',
+  'https://www.googleapis.com/auth/drive.readonly'
+];
 
 const credentials = {
   client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -9,23 +11,56 @@ const credentials = {
   redirect_uris: [import.meta.env.VITE_REDIRECT_URI || "https://visionary-buttercream-de5137.netlify.app"]
 };
 
-export async function getGoogleSheetsData(range: string) {
+export async function getGoogleSheetsData(accessToken: string, spreadsheetId: string, range: string = 'A1:Z1000') {
   try {
-    const auth = new google.auth.OAuth2(
-      credentials.client_id,
-      credentials.client_secret,
-      credentials.redirect_uris[0]
-    );
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
 
     const sheets = google.sheets({ version: 'v4', auth });
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
+      spreadsheetId,
       range,
     });
 
     return response.data.values;
   } catch (error) {
     console.error('Error fetching Google Sheets data:', error);
+    throw error;
+  }
+}
+
+export async function listAllSpreadsheets(accessToken: string) {
+  try {
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+
+    const drive = google.drive({ version: 'v3', auth });
+    const response = await drive.files.list({
+      q: "mimeType='application/vnd.google-apps.spreadsheet'",
+      fields: 'files(id, name, webViewLink)',
+      orderBy: 'modifiedTime desc'
+    });
+
+    return response.data.files;
+  } catch (error) {
+    console.error('Error listing spreadsheets:', error);
+    throw error;
+  }
+}
+
+export async function getSpreadsheetInfo(accessToken: string, spreadsheetId: string) {
+  try {
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+    const response = await sheets.spreadsheets.get({
+      spreadsheetId,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching spreadsheet info:', error);
     throw error;
   }
 }

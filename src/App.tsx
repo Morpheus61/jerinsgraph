@@ -11,11 +11,19 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  // Replace this with your actual Google Client ID
-  const GOOGLE_CLIENT_ID = "723709871722-us6e2ikngsm56ekldc1eq3dtpllmje68.apps.googleusercontent.com";
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    console.error('Google Client ID is not configured');
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-red-500">
+        Error: Google Client ID is not configured
+      </div>
+    );
+  }
 
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={clientId}>
       <AuthProvider>
         <AppContent />
       </AuthProvider>

@@ -69,3 +69,11 @@ export const LoginPage = () => {
               text="continue_with"
               shape="circle"
               disabled={isLoading}
+              ux_mode="popup"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
