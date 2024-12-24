@@ -14,11 +14,11 @@ export const LoginPage = () => {
   const [error, setError] = useState<LoginError>({ message: '', visible: false });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginSuccess = async (response: CredentialResponse) => {
+  const handleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     try {
       setIsLoading(true);
       setError({ message: '', visible: false });
-      await handleLogin(response);
+      handleLogin(credentialResponse);
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : 'Login failed. Please try again.',
@@ -37,8 +37,8 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div className="max-w-md w-full mx-4">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <BarChart className="w-16 h-16 text-indigo-500" />
@@ -46,7 +46,7 @@ export const LoginPage = () => {
           <h1 className="text-4xl font-bold text-white mb-2">
             Jerin's Graph Generator
           </h1>
-          <p className="text-gray-400 mb-8">
+          <p className="text-gray-400">
             Sign in with Google to visualize your spreadsheet data instantly
           </p>
         </div>
@@ -69,7 +69,6 @@ export const LoginPage = () => {
               text="continue_with"
               shape="circle"
               disabled={isLoading}
-              ux_mode="popup"
             />
           </div>
         </div>
